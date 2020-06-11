@@ -1,7 +1,9 @@
 package com.tomcat.dubug.tomcat_dubug;
 
+import com.tomcat.dubug.tomcat_dubug.autoconfig.ClassPathOnConditionConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -10,15 +12,13 @@ import java.util.concurrent.TimeUnit;
 public class TomcatDubugApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TomcatDubugApplication.class, args);
-		System.out.println(~100);
-		CountDownLatch countDownLatch = new CountDownLatch(1);
-		try {
-			countDownLatch.await(1000, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		ConfigurableApplicationContext context = SpringApplication.run(TomcatDubugApplication.class, args);
+		ClassPathOnConditionConfig config = context.getBean(ClassPathOnConditionConfig.class);
+		if (config != null){
+			System.out.println("--:"+config.grtString());
+		}else {
+			System.out.println("+++:classpath is null");
 		}
-		System.out.println(countDownLatch.getCount());
 	}
 
 }
