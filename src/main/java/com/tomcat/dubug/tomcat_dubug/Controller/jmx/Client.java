@@ -319,7 +319,8 @@ public class Client {
         }catch (Exception e){
             closeJmxConnection(hostport,login,password);
             jmxc.close();
-            slfLogger.error("jmx client error",e);
+//            slfLogger.error("jmx client error",e);
+            throw e;
         }
         //屏蔽源代码的关闭操作
 //        finally {

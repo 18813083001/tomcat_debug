@@ -89,10 +89,10 @@ public class JMXController {
                     getInfo(null,host+":"+jmxPort,beanName,null);
                     //不抛异常说明是tomcat
                     Map map = new HashMap(4);
-                    map.put("#CONTAINERTYPE",ContainnerEnum.tomcat.name());
-                    map.put("#SERVICEHOST",host);
-                    map.put("#SERVICEPORT",jmxPort);
-                    map.put("#SERVICENAME",container.getServiceName());
+                    map.put("{#CONTAINERTYPE}",ContainnerEnum.tomcat.name());
+                    map.put("{#SERVICEHOST}",host);
+                    map.put("{#SERVICEPORT}",jmxPort);
+                    map.put("{#SERVICENAME}",container.getServiceName());
                     resultList.add(map);
                 } catch (Exception e) {
                     //不是tomcat,忽略
