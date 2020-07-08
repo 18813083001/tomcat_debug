@@ -7,6 +7,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +20,9 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(value="tomcat")
-public class DeubugController {
+public class DebugController {
 
-    @RequestMapping(value="dubug")
+    @RequestMapping(value="debug")
     public ResponseEntity dubug(HttpServletRequest request, HttpServletResponse response){
         try {
 //            response.getWriter().println("hello");
@@ -38,15 +39,20 @@ public class DeubugController {
     }
 
 
-    @RequestMapping(value = "/cars", method = RequestMethod.GET)
-    public String init(@ModelAttribute("model") ModelMap model) {
-        List list = new ArrayList();
-        Map map = new HashMap();
-        map.put("make","make");
-        map.put("model","model");
-        model.addAttribute("carList", list);
-        return "index";
+    /**
+     * 测试阿里的arthas
+     * */
+    @RequestMapping("arthas")
+    public ResponseEntity arthas(@RequestParam(value = "list") List<String> list,String param){
+        System.out.println(list.toArray());
+        System.out.println(param);
+        HashMap map = new HashMap();
+        map.put("list",list);
+        map.put("param",param);
+        return ResponseEntity.ok(map);
     }
+
+
 
     class Car{
         private String make;
