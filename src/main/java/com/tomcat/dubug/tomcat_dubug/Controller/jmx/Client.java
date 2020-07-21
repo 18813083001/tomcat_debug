@@ -310,16 +310,20 @@ public class Client {
             final String password, final String beanname,
             final String [] command, final boolean oneBeanOnly)
     throws Exception {
+
         JMXConnector jmxc = getJMXConnector(hostport, login, password);
         Object [] result = null;
 
         try {
-            result = doBeans(jmxc.getMBeanServerConnection(),
-                getObjectName(beanname), command, oneBeanOnly);
+            String jmxCacheKey = generateConnectorKey(hostport,login,password);
+            //同一个服务的连接需要顺序使用，并发有问题，会导致ClientCommunicatorAdmin类中创建的线程无法销毁
+            synchronized (jmxCacheKey){
+                result = doBeans(jmxc.getMBeanServerConnection(),
+                        getObjectName(beanname), command, oneBeanOnly);
+            }
         }catch (Exception e){
-            closeJmxConnection(hostport,login,password);
-            jmxc.close();
-//            slfLogger.error("jmx client error",e);
+            //发生异常，不一定是因为连接不可用了，可能是因为beanname和command没有注册，所以不要关闭连接
+            //比如：java.lang.RuntimeException: Tomcat:name="http*",type=ThreadPool not registered.
             throw e;
         }
         //屏蔽源代码的关闭操作
@@ -789,6 +793,22 @@ public class Client {
             }
             return this.buffer.toString();
         }
+    }
+
+
+    /**
+     * 根据hostport+login+password拼成缓存key
+     * */
+    protected String generateConnectorKey(String hostPort, String login, String password){
+        StringBuilder builder = new StringBuilder();
+        builder.append(hostPort);
+        if (login != null){
+            builder.append(login);
+        }
+        if (password != null){
+            builder.append(password);
+        }
+        return builder.toString();
     }
 
     /**

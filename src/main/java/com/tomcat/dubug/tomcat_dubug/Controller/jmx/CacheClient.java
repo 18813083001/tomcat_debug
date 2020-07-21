@@ -82,7 +82,9 @@ public class CacheClient extends Client implements InitializingBean {
         if (jmxConnector == null){
             synchronized (connectorKey){
                 if (jmxConnector == null){
+                    logger.info("创建新连接开始");
                     jmxConnector = super.getJMXConnector(hostport, login, password);
+                    logger.error("创建新连接结束："+jmxConnector.toString());
                     cacheConnector.put(connectorKey,jmxConnector);
                 }
             }
@@ -90,27 +92,17 @@ public class CacheClient extends Client implements InitializingBean {
         return jmxConnector;
     }
 
-
-
     /**
-     * 根据hostport+login+password拼成缓存key
+     * 关闭连接
      * */
-    protected String generateConnectorKey(String hostPort, String login, String password){
-        StringBuilder builder = new StringBuilder();
-        builder.append(hostPort);
-        if (login != null){
-            builder.append(login);
+    public void closeJmxConnection(JMXConnector jmxConnector){
+        try {
+            logger.error("关闭连接开始："+jmxConnector.toString());
+            jmxConnector.close();
+            logger.error("关闭连接结束："+jmxConnector.toString());
+        } catch (IOException ex) {
+            logger.error("msg1={jmx关闭失败},,exception={},,StackTrace={}",ex.getMessage(),ex);
         }
-        if (password != null){
-            builder.append(password);
-        }
-        return builder.toString();
-    }
-
-    @Override
-    public void closeJmxConnection(String hostPort, String login, String password) {
-        String key = generateConnectorKey(hostPort,login,password);
-        cacheConnector.remove(key);
     }
 
     @Override
@@ -163,7 +155,12 @@ public class CacheClient extends Client implements InitializingBean {
                         checkConnection(entry.getValue());
                     }catch (Exception e){
                         //发生异常则认为该连接已经无效，然后删除该连接
+                        closeJmxConnection(entry.getValue());
+
+                        logger.error("删除连接开始："+entry.getValue().toString());
                         iterator.remove();
+                        logger.error("删除连接结束："+entry.getValue().toString());
+
                     }
                 }
             }
@@ -177,4 +174,5 @@ public class CacheClient extends Client implements InitializingBean {
 
         jmxConnector.getMBeanServerConnection().getDefaultDomain();
     }
+
 }
