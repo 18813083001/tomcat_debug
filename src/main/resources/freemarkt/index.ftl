@@ -3,6 +3,8 @@
 </div>
 <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js">
 </script>
+<script src="../js/test.js">
+</script>
 <div id="content">
     <fieldset>
         <legend>Add Car</legend>
@@ -31,8 +33,23 @@
     <script type="text/javascript">
         $(document).ready(function(){
             $("#captcha").click(function(){
-                $.get("http://10.250.102.42:9002/iam/v1/image/captcha/get",function(data,status){
-                    alert("数据: " + data + "\n状态: " + status);
+
+                // $.get("http://172.17.10.13:9359/cityBasicApi/getCityList",function(data,status){
+                //     alert("数据: " + data + "\n状态: " + status);
+                // });
+                $.ajax({
+                    type: 'GET',
+                    url: 'http://gateway10.51gofunev.com/api/juhe//cityBasicApi/getCityList',
+                    headers: {
+                        "X-API-TOKEN":"024b68d7b0a07b8a16db13dc601c648b"
+                    }
+                    //OR
+                    //beforeSend: function(xhr) {
+                    //  xhr.setRequestHeader("My-First-Header", "first value");
+                    //  xhr.setRequestHeader("My-Second-Header", "second value");
+                    //}
+                }).done(function(data) {
+                    alert(data);
                 });
             });
         });
